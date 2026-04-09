@@ -22,6 +22,7 @@ const getAllLinks = async (params: any, options: any) => {
           ],
         }
       : {}),
+    ...(params.parentId ? { parentId: Number(params.parentId) } : params.showMainOnly === "true" ? { parentId: null } : {}),
   };
 
   const data = await prisma.link.findMany({
@@ -29,13 +30,23 @@ const getAllLinks = async (params: any, options: any) => {
     take: limit,
     where,
     orderBy: { [sortBy]: sortOrder },
+    // @ts-ignore - subLinks relation added via prisma generate; TS server may need restart
+    include: {
+      subLinks: true,
+    },
   });
   const total = await prisma.link.count({ where });
   return { meta: { page, limit, total }, data };
 };
 
 const getSingleLink = async (id: number) => {
-  return prisma.link.findUniqueOrThrow({ where: { id } });
+  return prisma.link.findUniqueOrThrow({
+    where: { id },
+    // @ts-ignore - subLinks relation added via prisma generate; TS server may need restart
+    include: {
+      subLinks: true,
+    },
+  });
 };
 
 const updateLink = async (id: number, payload: Prisma.LinkUpdateInput) => {

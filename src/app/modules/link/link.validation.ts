@@ -5,6 +5,7 @@ export const createLinkZodSchema = z.object({
   description: z.string().min(1),
   image: z.string().optional(),
   link: z.string().url(),
+  parentId: z.number().int().optional(),
 });
 
 export const updateLinkZodSchema = z.object({
@@ -12,5 +13,6 @@ export const updateLinkZodSchema = z.object({
   description: z.string().min(1).optional(),
   image: z.string().optional().nullable(),
   link: z.string().url().optional(),
+  parentId: z.number().int().optional().nullable(),
 });
 

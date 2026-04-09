@@ -47,16 +47,24 @@ export const uploadBufferToCloudinary = async (
 
 export const deleteImageFromCloudinary = async (url: string) => {
   try {
-    // example
-    // https://res.cloudinary.com/djzppynpk/image/upload/v1753126572/ay9roxiv8ue-1753126570086-download-2-jpg.jpg.jpg
-
-    const regex = /\/v\d+\/(.*?)\.(jpg|jpeg|png|gif|webp)$/i;
-    const match = url.match(regex);
-
-    console.log({ match });
-
-    if (match && match[1]) {
-      const public_id = match[1];
+    const parts = url.split("/upload/");
+    if (parts.length < 2) return;
+    
+    let pathAfterUpload = parts[1];
+    
+    // Remove versioning (e.g., v1234567890/)
+    if (pathAfterUpload.match(/^v\d+\//)) {
+      pathAfterUpload = pathAfterUpload.replace(/^v\d+\//, '');
+    }
+    
+    // Remove extension
+    const lastDotIndex = pathAfterUpload.lastIndexOf('.');
+    let public_id = lastDotIndex !== -1 ? pathAfterUpload.substring(0, lastDotIndex) : pathAfterUpload;
+    
+    // Decode URI components (e.g., %20 to space) since Cloudinary expects the unencoded public_id
+    public_id = decodeURIComponent(public_id);
+    
+    if (public_id) {
       await cloudinary.uploader.destroy(public_id);
     }
   } catch (error: any) {

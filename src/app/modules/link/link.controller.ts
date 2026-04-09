@@ -16,7 +16,7 @@ const createLink = catchAsync(async (req: Request, res: Response) => {
 });
 
 const getAllLinks = catchAsync(async (req: Request, res: Response) => {
-  const filters = pick(req.query, ["q"]);
+  const filters = pick(req.query, ["q", "parentId", "showMainOnly"]);
   const options = pick(req.query, ["page", "limit", "sortBy", "sortOrder"]);
   const result = await LinkService.getAllLinks(filters, options);
   sendResponse(res, {
