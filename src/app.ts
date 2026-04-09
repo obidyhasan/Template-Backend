@@ -11,7 +11,12 @@ const app: Application = express();
 
 app.use(
   cors({
-    origin: ["http://localhost:3000", `${config.frontend_url}`],
+    origin: [
+      "http://localhost:3000",
+      "https://www.computercornerbd.com",
+      "https://computercornerbd.com",
+      `${config.frontend_url}`,
+    ],
     credentials: true,
   })
 );
