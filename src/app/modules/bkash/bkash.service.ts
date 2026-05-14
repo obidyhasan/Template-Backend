@@ -7,8 +7,28 @@ import httpStatus from "http-status";
 
 const TOKEN_KEY = "bkash:id_token";
 
+const getCachedToken = async (): Promise<string | null> => {
+  if (!redisClient.isReady) return null;
+  try {
+    return await redisClient.get(TOKEN_KEY);
+  } catch {
+    return null;
+  }
+};
+
+const cacheToken = async (token: string) => {
+  if (!redisClient.isReady) return;
+  try {
+    await redisClient.set(TOKEN_KEY, token, {
+      EX: 3600,
+    });
+  } catch {
+    // Cache failures should not block payment flow.
+  }
+};
+
 const getToken = async (): Promise<string> => {
-  const cached = await redisClient.get(TOKEN_KEY);
+  const cached = await getCachedToken();
   if (cached) return cached;
   return grantToken();
 };
@@ -32,9 +52,7 @@ const grantToken = async (): Promise<string> => {
   if (!data?.id_token) {
     throw new ApiError(httpStatus.BAD_GATEWAY, "Failed to obtain bkash token");
   }
-  await redisClient.set(TOKEN_KEY, data.id_token, {
-    EX: 3600,
-  });
+  await cacheToken(data.id_token);
   return data.id_token;
 };
 

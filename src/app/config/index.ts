@@ -20,6 +20,10 @@ export default {
     api_key: process.env.CLOUDINARY_API_KEY,
   },
   redis: {
+    enabled:
+      process.env.REDIS_ENABLED === "true"
+        ? true
+        : process.env.NODE_ENV !== "development",
     host: process.env.REDIS_HOST as string,
     port: Number(process.env.REDIS_PORT) as number,
     password: process.env.REDIS_PASSWORD as string,
